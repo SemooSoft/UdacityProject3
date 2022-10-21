@@ -66,7 +66,8 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-   test-frontend:
+  
+  test-frontend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -78,7 +79,8 @@ jobs:
           working_directory: ./frontend
           command: |
             npm run test
-    test-backend:
+  
+  test-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
@@ -97,4 +99,8 @@ workflows:
     jobs:
       - build-frontend
       - build-backend
+      - test-frontend:
+          requires: [build-frontend]
+      - test-backend:
+          requires: [build-backend]
       
