@@ -16,9 +16,7 @@ commands:
             aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
-    description: Revert the last migration if successfully run in the current workflow.
-    parameters:
-      # Add parameter here     
+    description: Revert the last migration if successfully run in the current workflow.   
     steps:
       - run:
           name: Revert migrations
@@ -227,8 +225,8 @@ jobs:
             grep "has been executed successfully" migrations_output.txt || (exit 1)                         
             curl https://kvdb.io/Lma7SCSvsHo6Cnf1weNFWx/migration_${CIRCLE_WORKFLOW_ID:0:7}?access_token=${KVDB_ACCESS_TOKEN} -d '1'
 
-      #- destroy-environments
-      #- revert-migrations
+      - destroy-environments
+      - revert-migrations
       - notify-slack
 
 
@@ -282,8 +280,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      #- destroy-environments          
-      #- revert-migrations
+      - destroy-environments          
+      - revert-migrations
       - notify-slack
 
   deploy-backend:
@@ -332,8 +330,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      #- destroy-environments
-      #- revert-migrations
+      - destroy-environments
+      - revert-migrations
       - notify-slack
   smoke-test:
     docker:
@@ -359,14 +357,8 @@ jobs:
           command: |
             URL=$(curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees") 
             echo ${URL}
-            #curl -s ${URL} | grep "Welcome" || (exit 1)
-            if curl -s ${URL} | grep "Welcome"
-            then
-              # Change this to 0 after the job fails
-              return 1
-            else
-              return 1
-            fi
+            curl -s ${URL} | grep "Welcome" || (exit 1)
+        
       - run:
           name: backend smoke-test
           working_directory: ./frontend
@@ -380,8 +372,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      #- destroy-environments
-      #- revert-migrations
+      - destroy-environments
+      - revert-migrations
       - notify-slack
 
   get_last_deployment_id:
@@ -488,7 +480,7 @@ workflows:
       - deploy-frontend:
           requires: [run-migrations]      
       - smoke-test:
-         requires: [deploy-frontend]
+         requires: [deploy-frontend,deploy-backend]
       - cloudfront-update:
           requires: [smoke-test,deploy-frontend,deploy-backend]
       - get_last_deployment_id:
