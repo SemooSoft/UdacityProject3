@@ -1,20 +1,20 @@
 ---
 - name: "make backend dir"
-  shell: mkdir ~/backend
+  shell: mkdir /home/ubuntu/backend
 
 - name: "send zipped backend file ==> "
   unarchive:
     src: ../../mybackend.tar.gz
-    dest: ~/
+    dest: /home/ubuntu
 
 - name: "install backend"
   npm:
-    path: ~/backend
+    path: /home/ubuntu/backend
     production: true
     global: true
 
 - name: "start the app"
   shell: |
-    cd ~/backend 
+    cd /home/ubuntu/backend 
     pm2 stop all
     pm2 start npm -- run start
