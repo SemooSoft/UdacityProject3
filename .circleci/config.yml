@@ -221,16 +221,16 @@ jobs:
           working_directory: ./backend
           command: |
             npm install
-            npm run migrations > migrations_output.txt  
+            npm run migrations | tee -a migrations_output.txt  
       - run:
           name: Send migration results to kvdb
           working_directory: ./backend
           command: |
-            grep -q "has been executed successfully" < migrations_output.txt || (exit 1)                       
+            grep "has been executed successfully" migrations_output.txt || (exit 1)                         
             curl https://kvdb.io/Lma7SCSvsHo6Cnf1weNFWx/migration_${CIRCLE_WORKFLOW_ID:0:7}?access_token=${KVDB_ACCESS_TOKEN} -d '1'
 
-      - destroy-environments
-      - revert-migrations
+      #- destroy-environments
+      #- revert-migrations
       - notify-slack
 
 
