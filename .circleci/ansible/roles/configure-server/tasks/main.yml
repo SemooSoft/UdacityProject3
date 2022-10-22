@@ -13,7 +13,6 @@
 
 - name: "install nodejs npm"
   become: true
-  global: true
   apt:
     name: ["nodejs", "npm"]
     state: latest
