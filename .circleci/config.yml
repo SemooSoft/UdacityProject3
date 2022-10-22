@@ -365,7 +365,6 @@ jobs:
 
       - run:
           name: Frontend smoke test
-          working_directory: ./backend
           command: |
             curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees" | grep "Welcomeww"  || (exit 1)
       - run:
