@@ -460,8 +460,6 @@ workflows:
          requires: [deploy-frontend,deploy-backend]
       - cloudfront-update:
           requires: [smoke-test]
-      - get_last_deployment_id:
-          requires: [cloudfront-update]
       - clean_up_old:
-          requires: [get_last_deployment_id]
+          requires: [cloudfront-update]
       
