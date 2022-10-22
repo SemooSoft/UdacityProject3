@@ -362,7 +362,7 @@ jobs:
       - run:
           name: Frontend smoke test
           command: |
-            curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees" | grep "Welcome"  || (exit 1)
+            curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees" | grep "Welcomeww"  || (exit 1)
       - run:
           name: Empty s3 bucket.
           when: on_fail
@@ -370,25 +370,6 @@ jobs:
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
       - destroy-environments
       - revert-migrations
-      - notify-slack
-
-  get_last_deployment_id:
-    docker:
-      - image: amazon/aws-cli
-    steps:
-      - checkout
-      - run: yum install -y tar gzip
-      - run:
-          name: Fetch and save the old pipeline ID (bucket name) responsible for the last release.
-          command: |
-            aws cloudformation \
-            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
-            --no-paginate --output text > ~/textfile.txt   
-            cat ~/textfile.txt
-      - persist_to_workspace:
-          root: ~/
-          paths: 
-            - textfile.txt 
       - notify-slack
 
   cloudfront-update:
@@ -435,7 +416,7 @@ jobs:
             do
               if [[ "${s3bucket}" != "${CurrentS3}" ]] 
               then
-                aws s3 rm s3://"${s3bucket:20:36}" --recursive
+                aws s3 rm s3://"${s3bucket:20:37}" --recursive
               else
                 echo "nothing to cleanup"
               fi
