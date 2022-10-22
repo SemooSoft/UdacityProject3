@@ -12,8 +12,8 @@ commands:
           name: Destroy environments
           when: on_fail
           command: |
-            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7} \
-            & aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
+            aws cloudformation delete-stack --stack-name frontend-${CIRCLE_WORKFLOW_ID:0:7} 
+            aws cloudformation delete-stack --stack-name backend-${CIRCLE_WORKFLOW_ID:0:7}
 
   revert-migrations:
     description: Revert the last migration if successfully run in the current workflow.
@@ -25,7 +25,7 @@ commands:
           when: on_fail
           command: |
             SUCCESS=$(curl https://kvdb.io/Lma7SCSvsHo6Cnf1weNFWx/migration_${CIRCLE_WORKFLOW_ID:0:7}?access_token=${KVDB_ACCESS_TOKEN})
-            if(( $SUCCESS==1 )); 
+            if(( $SUCCESS==1 ))
             then
               npm i
               npm run migrations:revert              
@@ -242,14 +242,14 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-          name: Get backend url
+          name: install python pip 
           command: |
             sudo apt update
             sudo apt upgrade -y
             sudo apt install python3-pip -y
             pip3 install --upgrade pip
       - run:
-          name: Get backend url
+          name: install aws
           command: |
             pip3 install awscli
       - run:
@@ -284,8 +284,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environments          
-      - revert-migrations
+      #- destroy-environments          
+      #- revert-migrations
       - notify-slack
 
   deploy-backend:
@@ -334,8 +334,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environments
-      - revert-migrations
+      #- destroy-environments
+      #- revert-migrations
       - notify-slack
   smoke-test:
     docker:
@@ -383,8 +383,8 @@ jobs:
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
-      - destroy-environments
-      - revert-migrations
+      #- destroy-environments
+      #- revert-migrations
       - notify-slack
 
   get_last_deployment_id:
@@ -497,5 +497,5 @@ workflows:
       - get_last_deployment_id:
           requires: [cloudfront-update]
       - clean_up_old:
-          requires: [cloudfront-update]
+          requires: [get_last_deployment_id]
       
