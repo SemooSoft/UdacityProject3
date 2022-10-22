@@ -233,7 +233,7 @@ jobs:
       - revert-migrations
       - notify-slack
 
-  ######################################## deploy-frontend ######################
+
   deploy-frontend:
     docker:
       - image: cimg/node:13.8.0
@@ -288,14 +288,13 @@ jobs:
       - revert-migrations
       - notify-slack
 
-#################################  deploy-backend ##########################################
   deploy-backend:
     docker:
       - image: cimg/node:13.8.0
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: ["f4:2d:87:92:f7:78:15:7a:6c:91:42:fb:61:06:74:20"]
+          fingerprints: ["1e:a1:e0:c0:10:e5:11:7a:eb:ba:be:93:81:b4:cc:3c"]
       - attach_workspace:
           at: .
       - run:
@@ -338,28 +337,117 @@ jobs:
       - destroy-environments
       - revert-migrations
       - notify-slack
+  smoke-test:
+    docker:
+      - image: cimg/node:13.8.0
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: install pip
+          command: |
+            sudo apt update 
+            sudo apt upgrade -y
+            sudo apt install python3-pip -y
+            pip3 install --upgrade pip
+      - run:
+          name: install awscli
+          command: |
+            pip3 install awscli
+      - run:
+          name: backend smoke-test
+          working_directory: ./frontend
+          command: |
+            source .env
+            echo "${API_URL}"
+            if curl "${API_URL}/api/status" | grep "ok"
+            then
+              return 0
+            else
+              return 1
+            fi
+      - run:
+          name: Frontend smoke test
+          command: |
+            URL=$(curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees") 
+            echo ${URL} 
+            if curl -s ${URL} | grep "Welcome"
+            then
+              return 1
+            else
+              return 1
+            fi
+      - run:
+          name: Empty s3 bucket.
+          when: on_fail
+          command: |
+            aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
+      - destroy-environments
+      - revert-migrations
+      - notify-slack
+
+  clean_up:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run: yum install -y tar gzip
+      - run:
+          name: final cleanup on success
+          command: |
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+            export S3LIST="$(aws s3 ls)"
+            export CurrentS3="$(aws s3 ls | grep ${CIRCLE_WORKFLOW_ID:0:7})" 
+            export STACKS=($(aws cloudformation list-stacks \
+                --query "StackSummaries[*].StackName"       \
+                --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+            echo Stack names: "${STACKS[@]}"
+            echo S3LIST names: "${S3LIST[@]}"
+
+            for s3bucket in "${S3LIST[@]}"
+            do
+              if [[ "${s3bucket}" != "${CurrentS3}" ]] 
+              then
+                aws s3 rm s3://"${s3bucket}" --recursive
+              else
+                echo "nothing to cleanup"
+              fi
+            done
+
+            for st in "${STACKS[@]}"
+            do
+              if [[ "${st}" != "frontend-${CIRCLE_WORKFLOW_ID:0:7}" ]] || [[ "${st}" != "backend-${CIRCLE_WORKFLOW_ID:0:7}" ]] || [[ "${st}" != "InitialStack-${CIRCLE_WORKFLOW_ID:0:7}" ]]
+              then
+                aws cloudformation delete-stack --stack-name "${st}"
+              else
+                echo "nothing to cleanup"
+              fi
+            done
+      - notify-slack  
 
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-frontend:
-          requires: [run-migrations]
-      - deploy-backend:
-          requires: [run-migrations]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-frontend:
+      #     requires: [run-migrations]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      - clean_up
       
