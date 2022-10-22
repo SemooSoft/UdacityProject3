@@ -26,7 +26,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      SecurityGroups: [!GetAtt InstanceSecurityGroup.GroupId ] # error chnaged
+      SecurityGroups: !Ref InstanceSecurityGroup
       KeyName: homyLesson2 # changed  
       ImageId: ami-08c40ec9ead489470  # changed
       Tags:
