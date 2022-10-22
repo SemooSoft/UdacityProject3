@@ -30,6 +30,13 @@ commands:
               npm i
               npm run migrations:revert              
             fi
+  notify-slack:
+    description: notify slack
+    steps:
+      - slack/notify:
+          channel: ${SLACK_DEFAULT_CHANNEL}
+          event: fail
+          template: basic_fail_1
             
 jobs:
   build-frontend:
