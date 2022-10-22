@@ -399,7 +399,7 @@ jobs:
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export S3LIST="$(aws s3 ls)"
             export CurrentS3="$(aws s3 ls | grep ${CIRCLE_WORKFLOW_ID:0:7})" 
-            echo "======>" "${CurrentS3}"
+            echo "====> ${CurrentS3}"
             export STACKS=($(aws cloudformation list-stacks \
                 --query "StackSummaries[*].StackName"       \
                 --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
