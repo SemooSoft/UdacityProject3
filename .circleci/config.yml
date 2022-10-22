@@ -25,11 +25,9 @@ commands:
           when: on_fail
           command: |
             SUCCESS=$(curl https://kvdb.io/Lma7SCSvsHo6Cnf1weNFWx/migration_${CIRCLE_WORKFLOW_ID:0:7}?access_token=${KVDB_ACCESS_TOKEN})
-            if(( $SUCCESS==1 ))
-            then
-              npm i
-              npm run migrations:revert              
-            fi
+            [[ $SUCCESS == 1 ]] || (exit 0)
+            npm install
+            npm run migrations:revert
   notify-slack:
     description: notify slack
     steps:
@@ -280,7 +278,7 @@ jobs:
               --query "Stacks[0].Outputs[?OutputKey=='WebsiteURL'].OutputValue" \
               --output text
       - run:
-          name: Empty s3 bucket.
+          name: Empty s3 bucket.  
           when: on_fail
           command: |
             aws s3 rm s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7} --recursive
@@ -355,28 +353,27 @@ jobs:
           name: install awscli
           command: |
             pip3 install awscli
+
       - run:
           name: Frontend smoke test
           command: |
             URL=$(curl -s "http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website-${AWS_DEFAULT_REGION}.amazonaws.com/#/employees") 
             echo ${URL}
+            #curl -s ${URL} | grep "Welcome" || (exit 1)
             if curl -s ${URL} | grep "Welcome"
             then
+              # Change this to 0 after the job fails
               return 1
             else
               return 1
-      - run: # return from function only
+            fi
+      - run:
           name: backend smoke-test
           working_directory: ./frontend
           command: |
             source .env
-            echo "${API_URL}" 
-            if curl "${API_URL}/api/status" | grep "ok" 
-            then
-              return 0
-            else
-              return 1
-            fi
+            echo "${API_URL}"
+            curl "${API_URL}/api/status" | grep "ok" || (exit 1)
       
       - run:
           name: Empty s3 bucket.
@@ -489,9 +486,9 @@ workflows:
       - deploy-backend:
           requires: [run-migrations]
       - deploy-frontend:
-          requires: [run-migrations,deploy-backend]      
+          requires: [run-migrations]      
       - smoke-test:
-         requires: [deploy-frontend,deploy-backend]
+         requires: [deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test,deploy-frontend,deploy-backend]
       - get_last_deployment_id:
