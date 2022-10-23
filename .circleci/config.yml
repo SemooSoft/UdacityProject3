@@ -382,6 +382,11 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install npm
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+            sudo yum install nodejs
+      - run:
           name: Execute cloudfront.yml 
           command: |
             aws cloudformation deploy \
@@ -424,7 +429,7 @@ jobs:
       - run: yum install -y tar gzip
       - run:
           name: final cleanup on success
-          #change seq if more than one
+          #change seq if more than one #
           command: |
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks \
@@ -462,32 +467,32 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
-      - deploy-infrastructure:
-          requires: [test-frontend, test-backend, scan-frontend, scan-backend]
-      - configure-infrastructure:
-          requires: [deploy-infrastructure]
-      - run-migrations:
-          requires: [configure-infrastructure]
-      - deploy-backend:
-          requires: [run-migrations]
-      - deploy-frontend:
-          requires: [run-migrations]      
-      - smoke-test:
-         requires: [deploy-frontend,deploy-backend]
-      - cloudfront-update:
-          requires: [smoke-test]
-      - get_workflow_id:
-          requires: [cloudfront-update]
-      - clean_up_old:
-          requires: [get_workflow_id]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
+      # - deploy-infrastructure:
+      #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
+      # - configure-infrastructure:
+      #     requires: [deploy-infrastructure]
+      # - run-migrations:
+      #     requires: [configure-infrastructure]
+      # - deploy-backend:
+      #     requires: [run-migrations]
+      # - deploy-frontend:
+      #     requires: [run-migrations]      
+      # - smoke-test:
+      #    requires: [deploy-frontend,deploy-backend]
+       - cloudfront-update
+      #     requires: [smoke-test]
+      # - get_workflow_id:
+      #     requires: [cloudfront-update]
+      # - clean_up_old:
+      #     requires: [get_workflow_id]
       
