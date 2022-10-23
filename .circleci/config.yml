@@ -434,10 +434,10 @@ jobs:
             for i in `seq 0 1 10`
             do
               export s3=$(aws s3api list-buckets --query "Buckets[$i].Name")
-              echo ${s3}
-              if [[ ${s3} != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] || [[ ${s3} != null ]]
+              echo $s3
+              if [[ $s3 != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] || [[ ${s3} != null ]]
               then
-                aws s3 rm s3://${s3} --recursive
+                aws s3api delete-bucket --bucket $s3 --region us-east-1
               else
                 echo "nothing to cleanup"
               fi
