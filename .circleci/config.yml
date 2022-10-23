@@ -434,9 +434,9 @@ jobs:
             for i in `seq 0 1 10`
             do
               
-              if [[$(aws s3api list-buckets --query "Buckets[$i].Name")  != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] || [[ ${s3} != null ]]
+              if [[(aws s3api list-buckets --query "Buckets[$i].Name")  != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] || [[ ${s3} != null ]]
               then
-                aws s3 rm s3://$(aws s3api list-buckets --query "Buckets[$i].Name") --recursive
+                aws s3 rm s3://(aws s3api list-buckets --query "Buckets[$i].Name") --recursive
               else
                 echo "nothing to cleanup"
               fi
