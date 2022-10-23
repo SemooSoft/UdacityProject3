@@ -382,7 +382,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Execute cloudfront.yml
+          name: Execute cloudfront.yml 
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
@@ -396,7 +396,8 @@ jobs:
       - destroy-environments
       - revert-migrations
       - notify-slack
-  get_last_deployment_id:
+  
+  get_workflow_id:
     docker:
       - image: amazon/aws-cli
     steps:
@@ -485,8 +486,8 @@ workflows:
          requires: [deploy-frontend,deploy-backend]
       - cloudfront-update:
           requires: [smoke-test]
-      - get_last_deployment_id:
+      - get_workflow_id:
           requires: [cloudfront-update]
       - clean_up_old:
-          requires: [cloudfront-update]
+          requires: [get_workflow_id]
       
