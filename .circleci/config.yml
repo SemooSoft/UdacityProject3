@@ -382,7 +382,12 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Execute cloudfront.yml
+          name: install npm
+          command: |
+            curl -sL https://rpm.nodesource.com/setup_10.x | sudo bash -
+            sudo yum install nodejs
+      - run:
+          name: Execute cloudfront.yml 
           command: |
             aws cloudformation deploy \
             --template-file .circleci/files/cloudfront.yml \
@@ -396,7 +401,8 @@ jobs:
       - destroy-environments
       - revert-migrations
       - notify-slack
-  get_last_deployment_id:
+  
+  get_workflow_id:
     docker:
       - image: amazon/aws-cli
     steps:
@@ -423,6 +429,7 @@ jobs:
       - run: yum install -y tar gzip
       - run:
           name: final cleanup on success
+          #change seq if more than one #
           command: |
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks \
@@ -460,16 +467,16 @@ jobs:
 workflows:
   default:
     jobs:
-      - build-frontend
-      - build-backend
-      - test-frontend:
-          requires: [build-frontend]
-      - test-backend:
-          requires: [build-backend]
-      - scan-frontend:
-          requires: [build-frontend]
-      - scan-backend:
-          requires: [build-backend]
+      # - build-frontend
+      # - build-backend
+      # - test-frontend:
+      #     requires: [build-frontend]
+      # - test-backend:
+      #     requires: [build-backend]
+      # - scan-frontend:
+      #     requires: [build-frontend]
+      # - scan-backend:
+      #     requires: [build-backend]
       # - deploy-infrastructure:
       #     requires: [test-frontend, test-backend, scan-frontend, scan-backend]
       # - configure-infrastructure:
@@ -482,10 +489,10 @@ workflows:
       #     requires: [run-migrations]      
       # - smoke-test:
       #    requires: [deploy-frontend,deploy-backend]
-      # - cloudfront-update:
+       - cloudfront-update
       #     requires: [smoke-test]
-      # - get_last_deployment_id:
+      # - get_workflow_id:
       #     requires: [cloudfront-update]
       # - clean_up_old:
-      #     requires: [cloudfront-update]
-#      
+      #     requires: [get_workflow_id]
+      
