@@ -435,7 +435,7 @@ jobs:
             do
               export s3=$(aws s3api list-buckets --query "Buckets[$i].Name")
               echo ${s3:1:17}
-              if [[ ${s3:1:17} != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] || [[ ${s3} != null ]]
+              if [[ ${s3:1:17} != udapeople-${CIRCLE_WORKFLOW_ID:0:7} ]] && [[ ${s3} != null ]]
               then
                 aws s3 rm s3://"${s3:1:17}" --recursive
                 #aws s3api delete-bucket --bucket ${s3:1:17} --region us-east-1 --recursive
