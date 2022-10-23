@@ -431,7 +431,7 @@ jobs:
             echo Stack names: "${STACKS[@]}"
             echo S3LIST names: "${S3LIST[@]}"
 
-            for i in `seq 0 1 10`
+            for i in `seq 0 1 3`
             do
               export s3=$(aws s3api list-buckets --query "Buckets[$i].Name")
               echo ${s3:1:17}
@@ -439,6 +439,7 @@ jobs:
               then
                 aws s3 rm s3://"${s3:1:17}" --recursive
                 #aws s3api delete-bucket --bucket ${s3:1:17} --region us-east-1 --recursive
+                sleep 5
               else
                 echo "nothing to cleanup"
               fi
