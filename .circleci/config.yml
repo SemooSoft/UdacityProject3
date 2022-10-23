@@ -439,7 +439,7 @@ jobs:
               then
                 aws s3 rm s3://"${s3:1:17}" --recursive
                 #aws s3api delete-bucket --bucket ${s3:1:17} --region us-east-1 --recursive
-                sleep 5
+                sleep 3
                 ##
               else
                 echo "nothing to cleanup"
