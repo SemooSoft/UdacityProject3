@@ -385,6 +385,7 @@ jobs:
           name: install npm
           command: |
             yum update
+            yum upgrade -y
             yum install nodejs -y
       - run:
           name: Execute cloudfront.yml 
