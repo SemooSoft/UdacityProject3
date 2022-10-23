@@ -448,7 +448,7 @@ jobs:
 
             for st in "${STACKS[@]}"
             do
-              if [[ "${st}" != "frontend-${CIRCLE_WORKFLOW_ID:0:7}" ]] || [[ "${st}" != "backend-${CIRCLE_WORKFLOW_ID:0:7}" ]] || [[ "${st}" != "InitialStack-${CIRCLE_WORKFLOW_ID:0:7}" ]]
+              if [[ "${st}" != "frontend-${CIRCLE_WORKFLOW_ID:0:7}" ]] && [[ "${st}" != "backend-${CIRCLE_WORKFLOW_ID:0:7}" ]] && [[ "${st}" != "InitialStack-${CIRCLE_WORKFLOW_ID:0:7}" ]]
               then
                 aws cloudformation delete-stack --stack-name "${st}"
               else
