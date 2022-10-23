@@ -378,15 +378,22 @@ jobs:
 
   cloudfront-update:
     docker:
-      - image: amazon/aws-cli
+      - image: cimg/node:13.8.0
     steps:
       - checkout
+      - attach_workspace:
+          at: .
       - run:
-          name: install npm
+          name: install pip
           command: |
-            yum update
-            yum upgrade -y
-            yum install nodejs -y
+            sudo apt update 
+            sudo apt upgrade -y
+            sudo apt install python3-pip -y
+            pip3 install --upgrade pip
+      - run:
+          name: install awscli
+          command: |
+            pip3 install awscli
       - run:
           name: Execute cloudfront.yml 
           command: |
