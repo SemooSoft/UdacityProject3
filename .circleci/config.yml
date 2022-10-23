@@ -423,6 +423,7 @@ jobs:
       - run: yum install -y tar gzip
       - run:
           name: final cleanup on success
+          #change seq if more than one
           command: |
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
             export STACKS=($(aws cloudformation list-stacks \
