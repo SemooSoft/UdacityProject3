@@ -1,5 +1,5 @@
 github   https://github.com/SemooSoft/UdacityProject3
 
-s3 url   
+s3 url   http://udapeople-75b3ab8.s3-website-us-east-1.amazonaws.com
 
-website url 
+website url d2ahehh7loy7v0.cloudfront.net
