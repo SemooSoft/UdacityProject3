@@ -492,7 +492,7 @@ workflows:
           filters:
             branches:
               only:
-                - master
+                - master           #done
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
