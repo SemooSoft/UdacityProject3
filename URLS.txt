@@ -1,5 +1,7 @@
 github   https://github.com/SemooSoft/UdacityProject3
 
-s3 url   http://udapeople-75b3ab8.s3-website-us-east-1.amazonaws.com
+s3 url   http://udapeople-641e1d1.s3-website-us-east-1.amazonaws.com/#/employees
 
-website url d2ahehh7loy7v0.cloudfront.net
+website url http://d33h516yn5ubma.cloudfront.net/#/employees
+
+prometheus http://ec2-54-208-28-0.compute-1.amazonaws.com:9090
